@@ -114,7 +114,7 @@ def run():
 
     while button1.isPressed() == False:
         # should be exit condition?
-        print('nothing pressed')
+        print('nothing pressed yet')
         time.sleep(0.1)
 
 # Class to control blinking of built-in lights
@@ -168,12 +168,14 @@ class BlinkLight():
 class DetectButtonPress():
     """Threaded class to detect digital input HIGH"""
     def __init__(self, inputName):
+        logging.debug("DetectButtonPress() object instatiated")
         self.inputName = inputName
         self.func = "automationhat.input." + self.inputName
         self.threadName = "DetectButtonPress %s", self.inputName
         self.value = 0
 
     def checkState(self):
+        logging.debug("DetectButtonPress.checkState()")
         while True:
             func = self.func + '.read()'
             inputState = eval(func)
@@ -181,10 +183,10 @@ class DetectButtonPress():
                 self.value = inputState
 
     def isPressed(self):
+        logging.debug("DetectButtonPress.isPressed")
         self.value = False
         checkStateThread = threading.Thread(target=self.checkState)
         checkStateThread.start()
-        logging.debug('Listening for button press')
         if self.value:
             return True
 
@@ -254,19 +256,24 @@ def startup():
 
 
 # Dim power light until startup sequence
+logging.debug("dimming Warn light, sleep")
 automationhat.light.warn.write(0.25)
 time.sleep(1)
 
 # Setup threads for user input and power button events
 # when either detected, call startup(), setup exit events, call run()
+logging.debug("calling set_run_conditions()")
 set_run_conditions()
 
+logging.debug("calling startup()")
 startup()
 
+logging.debug("calling set_stop_conditions()")
 set_stop_conditions()
     # wait for user input?
     # exit when button pushed
 
+logging.debug("starting thread for run()")
 threading.Thread(name="run", target=run).start() # remove once set_run_conditions works
 
 # EOF
