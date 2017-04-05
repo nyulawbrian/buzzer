@@ -175,7 +175,7 @@ class DetectButtonPress():
 
     def checkState(self):
         while True:
-            func = self.func + 'read()'
+            func = self.func + '.read()'
             inputState = eval(func)
             if inputState:
                 self.value = inputState
