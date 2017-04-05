@@ -273,7 +273,10 @@ set_stop_conditions()
     # wait for user input?
     # exit when button pushed
 
-logging.debug("starting thread for run()")
-threading.Thread(name="run", target=run).start() # remove once set_run_conditions works
+#logging.debug("starting thread for run()")
+#threading.Thread(name="run", target=run).start() # remove once set_run_conditions works
+
+logging.debug("calling run()")
+run()
 
 # EOF
