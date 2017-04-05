@@ -5,6 +5,7 @@ import automationhat
 import time
 import threading
 import logging
+import sys
 
 # Configure logging options
 logging.basicConfig(level=logging.DEBUG,format='[%(levelname)s] (%(threadName)-10s) %(message)s')
@@ -107,9 +108,14 @@ def run():
     # turn Relay 1 on to enable apartment station audio
     # after inactivity, turn both off
 
-    while True:
+    #threading.Thread(name="button1", target=)
+
+    button1 = DetectButtonPress("one")
+
+    while button1.isPressed() == False:
         # should be exit condition?
-        a=1
+        print('nothing pressed')
+        time.sleep(0.1)
 
 # Class to control blinking of built-in lights
 class BlinkLight():
@@ -165,19 +171,40 @@ class DetectButtonPress():
         self.inputName = inputName
         self.func = "automationhat.input." + self.inputName
         self.threadName = "DetectButtonPress %s", self.inputName
+        self.value = 0
 
-    def isPressed(self):
+    def checkState(self):
         while True:
             func = self.func + 'read()'
             inputState = eval(func)
             if inputState:
-                return
+                self.value = inputState
 
+    def isPressed(self):
+        self.value = False
+        checkStateThread = threading.Thread(target=self.checkState)
+        checkStateThread.start()
+        logging.debug('Listening for button press')
+        if self.value:
+            return True
 
 # Class to detect input
 
 
 # Class to set output?
+
+
+def start_stop():
+    isStarted = False
+
+    while True:
+        conInput = sys.stdin.read(1)
+        if conInput == 's':
+            if isStarted == False:
+                run()
+            else:
+                run('stop')
+
 
 
 
