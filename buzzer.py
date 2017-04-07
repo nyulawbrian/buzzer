@@ -17,10 +17,10 @@ parser.add_argument("-dt", "--doortimeout", type=int, default=5,
 args = parser.parse_args()
 
 # Configure logging options
-if args.debug:
-    logging.basicConfig(level=logging.DEBUG,
+loggingLevel = 'logging.DEBUG' if args.debug else 'logging.INFO'
+logging.basicConfig(level=eval(loggingLevel),
         format='[%(levelname)s] (%(threadName)-10s) %(message)s')
-    logging.debug('logging config SUCESSS')
+logging.info('Logging level {0}', loggingLevel)
 
 # Set constants
 doortimeout = args.doortimeout
