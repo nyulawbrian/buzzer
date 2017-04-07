@@ -43,11 +43,13 @@ class Blink():
     """Threaded class to blink built-in Pimoroni Automation HAT lights"""
 
     def __init__(self, targetType, targetID, blinkRate=0.25):
-        self.targetID = targetID
-        self.targetType = targetType
-        self.blinkRate = blinkRate
-        self.func = "automationhat" + "." + self.targetType + "." + self.targetID
-        self.threadName = "Blink %s", self.targetID
+        self.targetID         = targetID
+        self.targetType       = targetType
+        self.blinkRate        = blinkRate
+        self.func             = "automationhat" + "." + self.targetType + "." + self.targetID
+        self.threadName       = "Blink %s", self.targetID
+        self.thisThread       = threading.Thread(name=self.threadName,target=self.blink)
+        self.thisThread.event = threading.Event()
 
     def blink(self):
         # Turn light off
@@ -55,18 +57,18 @@ class Blink():
         func = self.func + ".off()"
         eval(func)
 
-        while True:
+        while self.thisThread.event.isSet():
             func = self.func + ".toggle()"
             eval(func)
             time.sleep(self.blinkRate)
 
     def on(self):
-        self.thisThread = threading.Thread(name=self.threadName,target=self.blink)
+        self.thisThread.event.set()
         self.thisThread.start()
         logging.debug('Blink STARTED')
 
     def off(self):
-        self.thisThread.stop()
+        self.thisThread.event.clear()
         logging.debug('Blink STOPPED')
 
         # Leave light off
