@@ -224,6 +224,8 @@ if __name__ == '__main__':
                     DOOR_BUTTON_PRESS.off()
                     break
                 time.sleep(0.1)
+            # when door button pressed, remainder of DOOR_TIMEOUT is skipped
+            # modify range to decreemnt or skip by DOOR_RELEASE_HOLD
 
             # Disable apartment station audio
             APT_STATION_AUDIO_DISABLE.on()
