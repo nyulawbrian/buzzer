@@ -6,21 +6,29 @@ import RPi.GPIO as GPIO
 import automationhat
 
 # Get command line arguments
-parser = argparse.ArgumentParser(description='Interface Raspberry Pi Pimoroni Automation HAT with Lee Dan style apartment station intercom.')
+DESCRIPTION = """Interface Raspberry Pi Pimoroni Automation HAT with Lee Dan
+                style apartment station intercom."""
+parser = argparse.ArgumentParser(description=DESCRIPTION)
 parser.add_argument('--debug', help='Enable console debug logging',
     action='store_true')
 parser.add_argument('-dt', '--doortimeout', type=int, default=5,
-    help='Length of time to wait after door tone detected in sec')
+    help='Seconds to wait after door tone detected, default 5')
+parser.add_argument('-dr', '--doorreleasehold', type=int, default=1,
+    help='Seconds to hold door release button, default 1')
 args = parser.parse_args()
 
 # Configure logging options
 loggingLevel = 'logging.DEBUG' if args.debug else 'logging.INFO'
+FORMAT = """%(asctime)-15s [%(levelname)s] (%(threadName)-10s) %(message)s"""
 logging.basicConfig(level=eval(loggingLevel),
-        format='%(asctime)-15s [%(levelname)s] (%(threadName)-10s) %(message)s')
-logging.info('Logging level {0}'.format(loggingLevel))
+        format=FORMAT)
+logging.info('Logging level is {0}'.format(loggingLevel))
 
 # Set constants
-doortimeout = args.doortimeout
+DOORTIMEOUT = args.doortimeout
+logging.debug('Door timeout is {0} second(s)'.format(DOORTIMEOUT))
+DOORRELEASEHOLD = args.doorreleasehold
+logging.debug('Door release hold is {0} second(s)'.format(DOORRELEASEHOLD))
 
 def reset_automation_hat():
     """Reset all hardware to off state"""
@@ -142,7 +150,7 @@ def startup():
 
 
 if __name__ == '__main__':
-    # Dim power light until startup sequence
+    # Dim warn light until startup sequence
     logging.debug('dimming Warn light')
     automationhat.light.warn.write(0.25)
     time.sleep(0.1)
@@ -160,7 +168,7 @@ if __name__ == '__main__':
         time.sleep(0.1)
 
         # Check if Input 1 is high
-        # This indicates that door tone is detected
+        #   to indicate that door tone is detected
         if automationhat.input.one.read():
             time.sleep(0.1)
             logging.info('Door tone detected.')
@@ -172,20 +180,31 @@ if __name__ == '__main__':
             time.sleep(0.1)
 
             # Turn Relay 1 off
-            # This enables apartment station audio
+            #   to enable apartment station audio
             automationhat.relay.one.off()
             logging.debug('Relay 1 turned off')
-            time.sleep(doortimeout)
+
+            # Poll for door release button press
+            for i in range(DOORTIMEOUT * 10):
+                if automationhat.input.three.read():
+                    logging.info('Door release button press detected.')
+                    # Turn Relay 2 on
+                    #   to simulate door release button press
+                    logging.debug('Pressing door release button.')
+                    automationhat.relay.two.on()
+                    time.sleep(DOORRELEASEHOLD)
+                    logging.debug('Releasing door release button.')
+                    automationhat.relay.two.off()
+                    break
+                time.sleep(0.1)
 
             # Turn Relay 1 on
-            # This disables the apartment station audio
+            #   to disable apartment station audio
             automationhat.relay.one.on()
             logging.debug('Relay 1 turned on')
-            #time.sleep(5)
 
             # Stop blinking indicator light
             indicator.off()
-            #time.sleep(1)
             continue
 
     logging.info('Shutting down.')
