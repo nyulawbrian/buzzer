@@ -38,26 +38,18 @@ def reset_automation_hat():
     automationhat.output.three.off()
 
 
-# Class to control blinking of built-in lights
-class BlinkLight():
+# Class to control blinking of lights, outputs, or relays
+class Blink():
     """Threaded class to blink built-in Pimoroni Automation HAT lights"""
 
-    def __init__(self, lightname, blinkRate=0.25):
-        import time #try test if imported
-        import threading #try test if imported
-        import logging #try test if imported
-
-        try:
-            import automationhat
-        except ImportError:
-            exit("Could not import autiomationhat")
-
-        self.lightname = lightname
+    def __init__(self, targetType, targetID, blinkRate=0.25):
+        self.targetID = targetID
+        self.targetType = targetType
         doblink = 0
         self.doblink = doblink
         self.blinkRate = blinkRate
-        self.func = "automationhat.light." + self.lightname
-        self.threadName = "BlinkLight %s", self.lightname
+        self.func = "automationhat" + "." + self.targetType + "." + self.targetID
+        self.threadName = "Blink %s", self.targetID
 
     def blink(self):
         # Turn light off
@@ -78,11 +70,11 @@ class BlinkLight():
         self.doblink = 1
         thisThread = threading.Thread(name=self.threadName,target=self.blink)
         thisThread.start()
-        logging.debug('BlinkLight STARTED')
+        logging.debug('Blink STARTED')
 
     def off(self):
         self.doblink = 0
-        logging.debug('BlinkLight STOPPED')
+        logging.debug('Blink STOPPED')
 
 
 def startup():
@@ -103,7 +95,7 @@ def startup():
     reset_automation_hat()
 
     # Blink power light to indicate startup sequence in progress
-    blinkPower = BlinkLight("power")
+    blinkPower = Blink("light","power")
     blinkPower.on()
 
     time.sleep(1)
@@ -143,14 +135,25 @@ if __name__ == '__main__':
         # Check if Input 1 is high
         # This indicates that door tone is detected
         if automationhat.input.one.read():
+            time.sleep(1)
             logging.debug("Input 1 is HIGH")
+
+            # Blink notification light via Output 1
+            indicator = Blink("output","one")
+            indicator.on()
+
             # Turn Relay 1 on
             # This enables apartment station audio
             automationhat.relay.one.off()
             logging.debug("Relay 1 turned on")
-            time.sleep(1)
+            time.sleep(5)
             automationhat.relay.one.on()
             logging.debug("Relay 1 turned off")
+            time.sleep(5)
+
+            # Stop blinking indicator light
+            indicator.off()
+
             continue
 
 
