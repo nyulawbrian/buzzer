@@ -15,6 +15,7 @@ parser.add_argument('-dt', '--doortimeout', type=int, default=5,
     help='Seconds to wait after door tone detected, default 5')
 parser.add_argument('-dr', '--doorreleasehold', type=int, default=1,
     help='Seconds to hold door release button, default 1')
+parser.add_argument('--noautostart', help='Require power button press for startup sequence', action='store_true')
 args = parser.parse_args()
 
 # Configure logging options
@@ -25,10 +26,21 @@ logging.basicConfig(level=eval(loggingLevel),
 logging.info('Logging level is {0}'.format(loggingLevel))
 
 # Set constants
-DOORTIMEOUT = args.doortimeout
-logging.debug('Door timeout is {0} second(s)'.format(DOORTIMEOUT))
-DOORRELEASEHOLD = args.doorreleasehold
-logging.debug('Door release hold is {0} second(s)'.format(DOORRELEASEHOLD))
+DOOR_TIMEOUT = args.doortimeout
+logging.debug('Door timeout is {0} second(s)'.format(DOOR_TIMEOUT))
+DOOR_RELEASE_HOLD = args.doorreleasehold
+logging.debug('Door release hold is {0} second(s)'.format(DOOR_RELEASE_HOLD))
+AUTO_START_OFF = args.noautostart
+logging.debug('Auto start disabled.')
+
+# Alias I/O ports to meaningful names
+APT_STATION_AUDIO_DISABLE = automationhat.relay.one
+DOOR_BUTTON_PRESS = automationhat.relay.two
+DOOR_TONE_DETECT_INDICATOR = automationhat.output.one
+DOOR_TONE_INPUT = automationhat.input.one
+POWER_BUTTON = automationhat.input.two
+DOOR_RELEASE_BUTTON_INPUT = automationhat.input.three
+
 
 def reset_automation_hat():
     """Reset all hardware to off state"""
@@ -126,15 +138,15 @@ def startup():
     logging.debug('Setting default hardware states STARTED')
 
     # Disable apartment station audio
-    automationhat.relay.one.on()
+    APT_STATION_AUDIO_DISABLE.on()
     time.sleep(0.1)
 
     # Set door button open
-    automationhat.relay.two.off()
+    DOOR_BUTTON_PRESS.off()
     time.sleep(0.1)
 
     # Set door tone detect indicator off
-    automationhat.output.one.off()
+    DOOR_TONE_DETECT_INDICATOR.off()
     time.sleep(0.1)
 
     # Set GPIO 14 HIGH for indicator light
@@ -155,21 +167,27 @@ if __name__ == '__main__':
     automationhat.light.warn.write(0.25)
     time.sleep(0.1)
 
-    logging.debug('calling startup()')
+    # If auto start diabled, wait for power button press
+    if AUTO_START_OFF:
+        logging.info('Waiting for power button press...')
+        while not POWER_BUTTON:
+            time.sleep(0.1)
+        logging.debug('Power button pressed.')
+
+    # Run startup sequence
     startup()
 
     # Set comms light on to indicate program running
     automationhat.light.comms.on()
-
     logging.info('Ready.')
 
-    # Check inputs and perform actions accordingly until "power" button pressed
-    while not automationhat.input.two.read():
+    # Run until power button is pressed
+    while not POWER_BUTTON.read():
         time.sleep(0.1)
 
         # Check if Input 1 is high
         #   to indicate that door tone is detected
-        if automationhat.input.one.read():
+        if DOOR_TONE_INPUT.read():
             time.sleep(0.1)
             logging.info('Door tone detected.')
             logging.debug('Input 1 is HIGH')
@@ -181,26 +199,26 @@ if __name__ == '__main__':
 
             # Turn Relay 1 off
             #   to enable apartment station audio
-            automationhat.relay.one.off()
-            logging.debug('Relay 1 turned off')
+            APT_STATION_AUDIO_DISABLE.off()
+            logging.debug('Apartment station audio enabled')
 
             # Poll for door release button press
-            for i in range(DOORTIMEOUT * 10):
-                if automationhat.input.three.read():
+            for i in range(DOOR_TIMEOUT * 10):
+                if DOOR_RELEASE_BUTTON_INPUT.read():
                     logging.info('Door release button press detected.')
                     # Turn Relay 2 on
                     #   to simulate door release button press
                     logging.debug('Pressing door release button.')
-                    automationhat.relay.two.on()
-                    time.sleep(DOORRELEASEHOLD)
+                    DOOR_BUTTON_PRESS.on()
+                    time.sleep(DOOR_RELEASE_HOLD)
                     logging.debug('Releasing door release button.')
-                    automationhat.relay.two.off()
+                    DOOR_BUTTON_PRESS.off()
                     break
                 time.sleep(0.1)
 
             # Turn Relay 1 on
             #   to disable apartment station audio
-            automationhat.relay.one.on()
+            APT_STATION_AUDIO_DISABLE.on()
             logging.debug('Relay 1 turned on')
 
             # Stop blinking indicator light
