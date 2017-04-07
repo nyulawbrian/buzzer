@@ -10,20 +10,20 @@ import argparse
 
 # Get command line arguments
 parser = argparse.ArgumentParser(description="Interface Raspberry Pi Pimoroni Automation HAT with Lee Dan style apartment station intercom.")
-parser.parse_args()
 parser.add_argument("--debug", help="Enable console debug logging",
     action="store_true")
 parser.add_argument("-dt", "--doortimeout", type=int, default=5,
     help="Length of time to wait after door tone detected in sec")
+args = parser.parse_args()
 
 # Configure logging options
-if parser.debug:
+if args.debug:
     logging.basicConfig(level=logging.DEBUG,
         format='[%(levelname)s] (%(threadName)-10s) %(message)s')
     logging.debug('logging config SUCESSS')
 
 # Set constants
-doortimeout = parser.doortimeout
+doortimeout = args.doortimeout
 
 def reset_automation_hat():
     """Reset all hardware to off state"""
