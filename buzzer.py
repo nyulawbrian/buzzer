@@ -139,7 +139,7 @@ if __name__ == '__main__':
     # Set comms light on to indicate program running
     automationhat.light.comms.on()
 
-    while True:
+    while not automationhat.input.two.read():
         # Check if Input 1 is high
         # This indicates that door tone is detected
         if automationhat.input.one.read():
@@ -148,7 +148,8 @@ if __name__ == '__main__':
             # This enables apartment station audio
             automationhat.relay.one.on()
             logging.debug("Relay 1 turned on")
-            time.sleep(5)
+            time.sleep(1)
+            automationhat.relay.one.on()
             logging.debug("Relay 1 turned off")
             continue
 
