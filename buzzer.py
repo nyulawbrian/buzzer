@@ -170,7 +170,7 @@ if __name__ == '__main__':
     # If auto start diabled, wait for power button press
     if AUTO_START_OFF:
         logging.info('Waiting for power button press...')
-        while not POWER_BUTTON:
+        while not POWER_BUTTON.read():
             time.sleep(0.1)
         logging.debug('Power button pressed.')
 
