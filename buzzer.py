@@ -9,20 +9,32 @@ import automationhat
 DESCRIPTION = """Interface Raspberry Pi Pimoroni Automation HAT with Lee Dan
                 style apartment station intercom."""
 parser = argparse.ArgumentParser(description=DESCRIPTION)
-parser.add_argument('--debug', help='Enable console debug logging',
-    action='store_true')
-parser.add_argument('-dt', '--doortimeout', type=int, default=5,
+parser.add_argument(
+    '--debug',
+    action='store_true',
+    help='Enable console debug logging')
+parser.add_argument(
+    '-dt', '--doortimeout',
+    type=int,
+    default=5,
     help='Seconds to wait after door tone detected, default 5')
-parser.add_argument('-dr', '--doorreleasehold', type=int, default=1,
+parser.add_argument(
+    '-dr', '--doorreleasehold',
+    type=int,
+    default=1,
     help='Seconds to hold door release button, default 1')
-parser.add_argument('--noautostart', help='Require power button press for startup sequence', action='store_true')
+parser.add_argument(
+    '--noautostart',
+    action='store_true',
+    help='Require power button press for startup sequence')
 args = parser.parse_args()
 
 # Configure logging options
 loggingLevel = 'logging.DEBUG' if args.debug else 'logging.INFO'
 FORMAT = """%(asctime)-15s [%(levelname)s] (%(threadName)-10s) %(message)s"""
-logging.basicConfig(level=eval(loggingLevel),
-        format=FORMAT)
+logging.basicConfig(
+    level=eval(loggingLevel),
+    format=FORMAT)
 logging.info('Logging level is {0}'.format(loggingLevel))
 
 # Set constants
@@ -34,12 +46,12 @@ AUTO_START_OFF = args.noautostart
 logging.debug('Auto start disabled.')
 
 # Alias I/O ports to meaningful names
-APT_STATION_AUDIO_DISABLE = automationhat.relay.one
-DOOR_BUTTON_PRESS = automationhat.relay.two
-DOOR_TONE_DETECT_INDICATOR = automationhat.output.one
-DOOR_TONE_INPUT = automationhat.input.one
-POWER_BUTTON = automationhat.input.two
-DOOR_RELEASE_BUTTON_INPUT = automationhat.input.three
+APT_STATION_AUDIO_DISABLE   = automationhat.relay.one
+DOOR_BUTTON_PRESS           = automationhat.relay.two
+DOOR_TONE_DETECT_INDICATOR  = automationhat.output.one
+DOOR_TONE_INPUT             = automationhat.input.one
+POWER_BUTTON                = automationhat.input.two
+DOOR_RELEASE_BUTTON_INPUT   = automationhat.input.three
 
 
 def reset_automation_hat():
@@ -185,20 +197,18 @@ if __name__ == '__main__':
     while not POWER_BUTTON.read():
         time.sleep(0.1)
 
-        # Check if Input 1 is high
-        #   to indicate that door tone is detected
+        # Check if door tone is detected
         if DOOR_TONE_INPUT.read():
             time.sleep(0.1)
             logging.info('Door tone detected.')
             logging.debug('Input 1 is HIGH')
 
-            # Blink notification light via Output 1
-            indicator = Blink('output','one')
-            indicator.on()
+            # Blink notification light
+            notification = Blink('output','one')
+            notification.on()
             time.sleep(0.1)
 
-            # Turn Relay 1 off
-            #   to enable apartment station audio
+            # Enable apartment station audio
             APT_STATION_AUDIO_DISABLE.off()
             logging.debug('Apartment station audio enabled')
 
@@ -206,8 +216,7 @@ if __name__ == '__main__':
             for i in range(DOOR_TIMEOUT * 10):
                 if DOOR_RELEASE_BUTTON_INPUT.read():
                     logging.info('Door release button press detected.')
-                    # Turn Relay 2 on
-                    #   to simulate door release button press
+                    # Emulate door release button press
                     logging.debug('Pressing door release button.')
                     DOOR_BUTTON_PRESS.on()
                     time.sleep(DOOR_RELEASE_HOLD)
@@ -216,17 +225,14 @@ if __name__ == '__main__':
                     break
                 time.sleep(0.1)
 
-            # Turn Relay 1 on
-            #   to disable apartment station audio
+            # Disable apartment station audio
             APT_STATION_AUDIO_DISABLE.on()
             logging.debug('Relay 1 turned on')
 
-            # Stop blinking indicator light
-            indicator.off()
+            # Stop blinking notification light
+            notification.off()
             continue
 
     logging.info('Shutting down.')
-
-
 
 # EOF
