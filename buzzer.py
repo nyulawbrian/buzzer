@@ -1,12 +1,9 @@
 #! /usr/bin/python
 
-# Sandbox Python script
+import time, sys, logging
+import argparse, threading
+import Rpi.GPIO as GPIO
 import automationhat
-import time
-import threading
-import logging
-import sys
-import argparse
 
 # Get command line arguments
 parser = argparse.ArgumentParser(description='Interface Raspberry Pi Pimoroni Automation HAT with Lee Dan style apartment station intercom.')
@@ -132,8 +129,9 @@ def startup():
     automationhat.output.one.off()
     time.sleep(0.1)
 
-    # Set GPIO 14 high for indicator light
-
+    # Set GPIO 14 HIGH for indicator light
+    GPIO.setup(14, GPIO.OUT)
+    GPIO.output(14, GPIO.HIGH)
 
     logging.debug('Setting default hardware states COMPLETED')
     blinkPower.off()
