@@ -97,23 +97,23 @@ def startup():
     blinkPower = Blink("light","power")
     blinkPower.on()
 
-    time.sleep(1)
+    time.sleep(0.1)
     logging.debug('Hardware initialization COMPLETED')
 
     # Set default hardware states
     logging.debug('Setting default hardware states STARTED')
     # Disable apartment station audio
     automationhat.relay.one.on()
-    time.sleep(1)
+    time.sleep(0.1)
     # Set door button open
     automationhat.relay.two.off()
-    time.sleep(1)
+    time.sleep(0.1)
     # Set door tone detect indicator off
     automationhat.output.one.off()
-    time.sleep(1)
+    time.sleep(0.1)
     logging.debug('Setting default hardware states COMPLETED')
     blinkPower.off()
-    time.sleep(1)
+    time.sleep(0.1)
     automationhat.light.power.on()
     logging.info('Startup sequence COMPLETED')
 
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     # Dim power light until startup sequence
     logging.debug("dimming Warn light")
     automationhat.light.warn.write(0.25)
-    time.sleep(1)
+    time.sleep(0.1)
 
     logging.debug("calling startup()")
     startup()
@@ -136,29 +136,29 @@ if __name__ == '__main__':
         # Check if Input 1 is high
         # This indicates that door tone is detected
         if automationhat.input.one.read():
-            time.sleep(1)
+            time.sleep(0.1)
             logging.debug("Input 1 is HIGH")
 
             # Blink notification light via Output 1
             indicator = Blink("output","one")
             indicator.on()
-            time.sleep(1)
-
-            # Turn Relay 1 on
-            # This enables apartment station audio
-            automationhat.relay.one.off()
-            logging.debug("Relay 1 turned on")
-            time.sleep(5)
+            time.sleep(0.1)
 
             # Turn Relay 1 off
-            # This disables the apartment station audio
-            automationhat.relay.one.on()
+            # This enables apartment station audio
+            automationhat.relay.one.off()
             logging.debug("Relay 1 turned off")
             time.sleep(5)
 
+            # Turn Relay 1 on
+            # This disables the apartment station audio
+            automationhat.relay.one.on()
+            logging.debug("Relay 1 turned on")
+            #time.sleep(5)
+
             # Stop blinking indicator light
             indicator.off()
-            time.sleep(1)
+            #time.sleep(1)
             continue
 
 
