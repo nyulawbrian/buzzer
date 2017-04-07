@@ -57,9 +57,10 @@ class Blink():
         self.targetID         = targetID
         self.targetType       = targetType
         self.blinkRate        = blinkRate
-        self.func             = "automationhat.%s.%s", self.targetType,
-                                self.targetID
-        self.threadName       = "Blink %s %s", self.targetType, self.targetID
+        self.func             = 'automationhat.{0}.{1}'.format(self.targetType,
+                                self.targetID)
+        self.threadName       = "Blink {0} {1}".format(self.targetType,
+                                self.targetID)
         self.thisThread       = threading.Thread(name=self.threadName,
                                 target=self.blink)
         self.thisThread.event = threading.Event()
