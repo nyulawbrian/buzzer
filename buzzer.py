@@ -45,8 +45,6 @@ class Blink():
     def __init__(self, targetType, targetID, blinkRate=0.25):
         self.targetID = targetID
         self.targetType = targetType
-        doblink = 0
-        self.doblink = doblink
         self.blinkRate = blinkRate
         self.func = "automationhat" + "." + self.targetType + "." + self.targetID
         self.threadName = "Blink %s", self.targetID
@@ -57,24 +55,23 @@ class Blink():
         func = self.func + ".off()"
         eval(func)
 
-        while self.doblink:
+        while True:
             func = self.func + ".toggle()"
             eval(func)
             time.sleep(self.blinkRate)
 
-        # Leave light off
-        func = self.func + ".off()"
-        eval(func)
-
     def on(self):
-        self.doblink = 1
-        thisThread = threading.Thread(name=self.threadName,target=self.blink)
-        thisThread.start()
+        self.thisThread = threading.Thread(name=self.threadName,target=self.blink)
+        self.thisThread.start()
         logging.debug('Blink STARTED')
 
     def off(self):
-        self.doblink = 0
+        self.thisThread.stop()
         logging.debug('Blink STOPPED')
+
+        # Leave light off
+        func = self.func + ".off()"
+        eval(func)
 
 
 def startup():
@@ -132,6 +129,8 @@ if __name__ == '__main__':
     automationhat.light.comms.on()
 
     while not automationhat.input.two.read():
+        time.sleep(0.1)
+
         # Check if Input 1 is high
         # This indicates that door tone is detected
         if automationhat.input.one.read():
@@ -141,19 +140,23 @@ if __name__ == '__main__':
             # Blink notification light via Output 1
             indicator = Blink("output","one")
             indicator.on()
+            time.sleep(1)
 
             # Turn Relay 1 on
             # This enables apartment station audio
             automationhat.relay.one.off()
             logging.debug("Relay 1 turned on")
             time.sleep(5)
+
+            # Turn Relay 1 off
+            # This disables the apartment station audio
             automationhat.relay.one.on()
             logging.debug("Relay 1 turned off")
             time.sleep(5)
 
             # Stop blinking indicator light
             indicator.off()
-
+            time.sleep(1)
             continue
 
 
