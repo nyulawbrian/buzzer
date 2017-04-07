@@ -9,18 +9,18 @@ import sys
 import argparse
 
 # Get command line arguments
-parser = argparse.ArgumentParser(description="Interface Raspberry Pi Pimoroni Automation HAT with Lee Dan style apartment station intercom.")
-parser.add_argument("--debug", help="Enable console debug logging",
-    action="store_true")
-parser.add_argument("-dt", "--doortimeout", type=int, default=5,
-    help="Length of time to wait after door tone detected in sec")
+parser = argparse.ArgumentParser(description='Interface Raspberry Pi Pimoroni Automation HAT with Lee Dan style apartment station intercom.')
+parser.add_argument('--debug', help='Enable console debug logging',
+    action='store_true')
+parser.add_argument('-dt', '--doortimeout', type=int, default=5,
+    help='Length of time to wait after door tone detected in sec')
 args = parser.parse_args()
 
 # Configure logging options
 loggingLevel = 'logging.DEBUG' if args.debug else 'logging.INFO'
 logging.basicConfig(level=eval(loggingLevel),
         format='[%(levelname)s] (%(threadName)-10s) %(message)s')
-logging.info('Logging level {0}', loggingLevel)
+logging.info('Logging level {0}'.format(loggingLevel))
 
 # Set constants
 doortimeout = args.doortimeout
@@ -59,7 +59,7 @@ class Blink():
         self.blinkRate        = blinkRate
         self.func             = 'automationhat.{0}.{1}'.format(self.targetType,
                                 self.targetID)
-        self.threadName       = "Blink {0} {1}".format(self.targetType,
+        self.threadName       = 'Blink {0} {1}'.format(self.targetType,
                                 self.targetID)
         self.thisThread       = threading.Thread(name=self.threadName,
                                 target=self.blink)
@@ -70,11 +70,11 @@ class Blink():
 
         # Turn light off
         # Necessary if light previously set to float brightness value
-        func = self.func + ".off()"
+        func = '{0}.off()'.format(self.func)
         eval(func)
 
         while self.thisThread.event.isSet():
-            func = self.func + ".toggle()"
+            func = '{0}.toggle()'.format(self.func)
             eval(func)
             time.sleep(self.blinkRate)
 
@@ -88,7 +88,7 @@ class Blink():
         self.thisThread.event.clear()
 
         # Leave light off
-        func = self.func + ".off()"
+        func = '{0}.off()'.format(self.func)
         eval(func)
 
 
@@ -97,7 +97,7 @@ def startup():
     hardware presence and states, then setup default states"""
 
     logging.info('Starting up...')
-    logging.debug("Startup sequence STARTED")
+    logging.debug('Startup sequence STARTED')
 
     if automationhat.is_automation_hat():
         logging.info('Automation HAT detected.')
@@ -111,7 +111,7 @@ def startup():
     reset_automation_hat()
 
     # Blink power light to indicate startup sequence in progress
-    blinkPower = Blink("light","power")
+    blinkPower = Blink('light','power')
     blinkPower.on()
 
     time.sleep(0.1)
@@ -140,16 +140,16 @@ def startup():
     time.sleep(0.1)
     automationhat.light.power.on()
 
-    logging.debug("Startup sequence COMPLETED")
+    logging.debug('Startup sequence COMPLETED')
 
 
 if __name__ == '__main__':
     # Dim power light until startup sequence
-    logging.debug("dimming Warn light")
+    logging.debug('dimming Warn light')
     automationhat.light.warn.write(0.25)
     time.sleep(0.1)
 
-    logging.debug("calling startup()")
+    logging.debug('calling startup()')
     startup()
 
     # Set comms light on to indicate program running
@@ -165,24 +165,24 @@ if __name__ == '__main__':
         # This indicates that door tone is detected
         if automationhat.input.one.read():
             time.sleep(0.1)
-            logging.info("Door tone detected.")
-            logging.debug("Input 1 is HIGH")
+            logging.info('Door tone detected.')
+            logging.debug('Input 1 is HIGH')
 
             # Blink notification light via Output 1
-            indicator = Blink("output","one")
+            indicator = Blink('output','one')
             indicator.on()
             time.sleep(0.1)
 
             # Turn Relay 1 off
             # This enables apartment station audio
             automationhat.relay.one.off()
-            logging.debug("Relay 1 turned off")
+            logging.debug('Relay 1 turned off')
             time.sleep(doortimeout)
 
             # Turn Relay 1 on
             # This disables the apartment station audio
             automationhat.relay.one.on()
-            logging.debug("Relay 1 turned on")
+            logging.debug('Relay 1 turned on')
             #time.sleep(5)
 
             # Stop blinking indicator light
@@ -190,7 +190,7 @@ if __name__ == '__main__':
             #time.sleep(1)
             continue
 
-    logging.info("Shutting down.")
+    logging.info('Shutting down.')
 
 
 
