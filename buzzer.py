@@ -2,7 +2,7 @@
 
 import time, sys, logging
 import argparse, threading
-import Rpi.GPIO as GPIO
+import RPi.GPIO as GPIO
 import automationhat
 
 # Get command line arguments
