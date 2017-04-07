@@ -146,7 +146,7 @@ if __name__ == '__main__':
             logging.debug("Input 1 is HIGH")
             # Turn Relay 1 on
             # This enables apartment station audio
-            automationhat.relay.one.on()
+            automationhat.relay.one.off()
             logging.debug("Relay 1 turned on")
             time.sleep(1)
             automationhat.relay.one.on()
