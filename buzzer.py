@@ -97,28 +97,36 @@ class Blink():
     def blink(self):
         logging.debug('Blink STARTED')
 
-        # Turn light off
-        # Necessary if light previously set to float brightness value
-        func = '{0}.off()'.format(self.func)
-        eval(func)
+        # Turn output off
+        # Necessary for toggle() method to function if output previously set
+        # to a float value via the write() method
+        turnOff = '{0}.off()'.format(self.func)
+        eval(turnOff)
 
+        # Create event handler to end loop and stop blinking output
         while self.thisThread.event.isSet():
-            func = '{0}.toggle()'.format(self.func)
-            eval(func)
+            toggleState = '{0}.toggle()'.format(self.func)
+            eval(toggleState)
             time.sleep(self.blinkRate)
 
         logging.debug('Blink STOPPED')
 
     def on(self):
+        # Read current state of output
+        readState = '{0}.read()'.format(self.func)
+        self.originalState = eval(readState)
+        
+        # Set event state and start thread
         self.thisThread.event.set()
         self.thisThread.start()
 
     def off(self):
+        # Clear event state to end blink loop
         self.thisThread.event.clear()
 
-        # Leave light off
-        func = '{0}.off()'.format(self.func)
-        eval(func)
+        # Set output back to original state
+        revertState = '{0}.write({1})'.format(self.func, self.originalState)
+        eval(revertState)
 
 
 def startup():
