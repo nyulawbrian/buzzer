@@ -78,6 +78,21 @@ def reset_automation_hat():
     automationhat.output.three.off()
 
 
+def press_door_release():
+    # Emulate door release button press
+
+    # Press button
+    logging.debug('Pressing door release button.')
+    DOOR_BUTTON_PRESS.on()
+
+    # Wait to release button for predetermiend time
+    time.sleep(DOOR_RELEASE_HOLD)
+
+    # Release button
+    logging.debug('Releasing door release button.')
+    DOOR_BUTTON_PRESS.off()
+
+
 # Class to control blinking of lights, outputs, or relays
 class Blink():
     """Threaded class to blink Pimoroni Automation HAT interfaces"""
@@ -97,13 +112,8 @@ class Blink():
     def blink(self):
         logging.debug('Blink STARTED')
 
-        # Turn output off
-        # Necessary for toggle() method to function if output previously set
-        # to a float value via the write() method
-        turnOff = '{0}.off()'.format(self.func)
-        eval(turnOff)
-
-        # Create event handler to end loop and stop blinking output
+        # Loop to blink output by using toggle() function
+        # Using event handler for signal to end loop
         while self.thisThread.event.isSet():
             toggleState = '{0}.toggle()'.format(self.func)
             eval(toggleState)
@@ -115,7 +125,14 @@ class Blink():
         # Read current state of output
         readState = '{0}.read()'.format(self.func)
         self.originalState = eval(readState)
-        
+        logging.debug('Current state of output: {0}'.format(self.originalState))
+
+        # Turn output off
+        # Necessary for toggle() method to function if output previously set
+        # to a float value via the write() method
+        turnOff = '{0}.off()'.format(self.func)
+        eval(turnOff)
+
         # Set event state and start thread
         self.thisThread.event.set()
         self.thisThread.start()
@@ -127,6 +144,7 @@ class Blink():
         # Set output back to original state
         revertState = '{0}.write({1})'.format(self.func, self.originalState)
         eval(revertState)
+        logging.debug('Reverting output to original state: {0}'.format(self.originalState))
 
 
 def startup():
@@ -209,7 +227,7 @@ if __name__ == '__main__':
         if DOOR_TONE_INPUT.read():
             time.sleep(0.1)
             logging.info('Door tone detected.')
-            logging.debug('Input 1 is HIGH')
+            logging.debug('DOOR_TONE_INPUT is HIGH')
 
             # Blink notification light
             notification = Blink('output','one')
@@ -218,30 +236,32 @@ if __name__ == '__main__':
 
             # Enable apartment station audio
             APT_STATION_AUDIO_DISABLE.off()
-            logging.debug('Apartment station audio enabled')
+            logging.debug('APT_STATION_AUDIO_DISABLE is OFF')
 
             # Poll for door release button press
             for i in range(DOOR_TIMEOUT * 10):
                 if DOOR_RELEASE_BUTTON_INPUT.read():
                     logging.info('Door release button press detected.')
-                    # Emulate door release button press
-                    logging.debug('Pressing door release button.')
-                    DOOR_BUTTON_PRESS.on()
-                    time.sleep(DOOR_RELEASE_HOLD)
-                    logging.debug('Releasing door release button.')
-                    DOOR_BUTTON_PRESS.off()
-                    break
+                    press_door_release()
+                    #break
                 time.sleep(0.1)
+
             # when door button pressed, remainder of DOOR_TIMEOUT is skipped
             # modify range to decreemnt or skip by DOOR_RELEASE_HOLD
 
             # Disable apartment station audio
             APT_STATION_AUDIO_DISABLE.on()
-            logging.debug('Relay 1 turned on')
+            logging.debug('APT_STATION_AUDIO_DISABLE is ON')
 
             # Stop blinking notification light
             notification.off()
-            continue
+            #continue
+
+        # Poll for door release button press, even if door tone not detected
+        elif DOOR_RELEASE_BUTTON_INPUT.read():
+            logging.debug('Door release button detected without door tone')
+            press_door_release()
+            time.sleep(0.1)
 
     logging.info('Shutting down.')
 
