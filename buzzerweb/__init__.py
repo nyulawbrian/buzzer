@@ -1,0 +1,1 @@
+from .buzzerweb import app
