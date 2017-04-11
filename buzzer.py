@@ -4,6 +4,7 @@ import time, sys, logging
 import argparse, threading
 import RPi.GPIO as GPIO
 import automationhat
+import rpyc
 
 # Get command line arguments
 DESCRIPTION = """Interface Raspberry Pi Pimoroni Automation HAT with Lee Dan
@@ -243,11 +244,7 @@ if __name__ == '__main__':
                 if DOOR_RELEASE_BUTTON_INPUT.read():
                     logging.info('Door release button press detected.')
                     press_door_release()
-                    #break
                 time.sleep(0.1)
-
-            # when door button pressed, remainder of DOOR_TIMEOUT is skipped
-            # modify range to decreemnt or skip by DOOR_RELEASE_HOLD
 
             # Disable apartment station audio
             APT_STATION_AUDIO_DISABLE.on()
