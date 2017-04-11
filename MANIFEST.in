@@ -1,0 +1,2 @@
+graft buzzerweb/templates
+graft buzzerweb/static
