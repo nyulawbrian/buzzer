@@ -11,7 +11,7 @@ app = Flask(__name__)
 def hello_world():
     automationhat.light.power.on()
     time.sleep(5)
-    return 'Hello, world!'
+    return 'Power light ={0}'.format(automationhat.light.power.read())
 
 
 #EOF
