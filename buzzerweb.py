@@ -12,9 +12,9 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 
 # Load config
-app.config.update(dict(
-    host='0.0.0.0'
-))
+#app.config.update(dict(
+#
+#))
 
 # Set (export) env var to point to a config file
 # app.config.from_envvar('SOMEENVVAR', silent=True)
@@ -24,7 +24,8 @@ app.config.update(dict(
 def hello_world():
     automationhat.light.power.toggle()
     time.sleep(5)
-    return 'Power light ={0}'.format(automationhat.light.power.read())
+    flash('Power light ={0}'.format(automationhat.light.power.read()))
+    return 'a'
 
 
 #EOF
