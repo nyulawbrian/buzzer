@@ -45,6 +45,8 @@ DOOR_RELEASE_HOLD = args.doorreleasehold
 logging.debug('Door release hold is {0} second(s)'.format(DOOR_RELEASE_HOLD))
 AUTO_START_OFF = args.noautostart
 logging.debug('Auto start disabled.')
+STARTED = False
+logging.debug('STARTED = False')
 
 # Alias I/O ports to meaningful names
 APT_STATION_AUDIO_DISABLE   = automationhat.relay.one
@@ -92,6 +94,10 @@ def press_door_release():
     # Release button
     logging.debug('Releasing door release button.')
     DOOR_BUTTON_PRESS.off()
+
+
+def is_started():
+    return STARTED
 
 
 # Class to control blinking of lights, outputs, or relays
@@ -214,7 +220,10 @@ if __name__ == '__main__':
         logging.debug('Power button pressed.')
 
     # Run startup sequence
+    logging.debug('is_started() {0}'.format(is_started()))
     startup()
+    STARTED = True
+    logging.debug('is_started() {0}'.format(is_started()))
 
     # Set comms light on to indicate program running
     automationhat.light.comms.on()

@@ -2,7 +2,7 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
 
 import rpyc
-import automationhat
+#import automationhat
 import time
 import logging
 
@@ -34,7 +34,7 @@ logging.debug('loaded config from __name__')
 @app.route('/')
 def hello_world():
     logging.debug('in hello_worl()')
-    automationhat.light.power.toggle()
+    #automationhat.light.power.toggle()
     time.sleep(5)
     #flash('Power light ={0}'.format(automationhat.light.power.read()))
     return 'hi'
