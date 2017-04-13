@@ -24,8 +24,8 @@ app.config.from_object(__name__)
 def hello_world():
     automationhat.light.power.toggle()
     time.sleep(5)
-    flash('Power light ={0}'.format(automationhat.light.power.read()))
-    return 'a'
+    #flash('Power light ={0}'.format(automationhat.light.power.read()))
+    return 'hi'
 
 
 #EOF
