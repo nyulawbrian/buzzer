@@ -158,7 +158,8 @@ class Blink():
 # Class for RPyC server
 class CheckStatus(rpyc.Service):
     def __init__(self):
-
+        pass
+        
     def is_started(self):
         return STARTED
 
