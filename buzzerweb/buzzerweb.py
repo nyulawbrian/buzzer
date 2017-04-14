@@ -31,7 +31,9 @@ logging.debug('loaded config from __name__')
 # app.config.from_envvar('SOMEENVVAR', silent=True)
 
 # Create RPyC connection to buzzerctl
-buzzconn = rpyc.connect("localhost", 8080)
+RPYCHOST = 'localhost'
+RPYCPORT = 5001
+buzzconn = rpyc.connect(RPYCHOST, RPYCPORT)
 buzzerctl = buzzconn.root
 
 

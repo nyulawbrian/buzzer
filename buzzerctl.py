@@ -48,6 +48,8 @@ AUTO_START_OFF = args.noautostart
 logging.debug('Auto start disabled.')
 STARTED = False
 logging.debug('STARTED = False')
+RPYCHOST = 'localhost'
+RPYCPORT = 5001
 
 # Alias I/O ports to meaningful names
 APT_STATION_AUDIO_DISABLE   = automationhat.relay.one
@@ -156,12 +158,13 @@ class Blink():
 
 
 # Class for RPyC server
-class CheckStatus(rpyc.Service):
-    def __init__(self):
-        pass
-        
-    def is_started(self):
-        return STARTED
+class BuzzerctlService(rpyc.Service):
+    pass
+    #def __init__(self):
+    #    pass
+    #
+    #def is_started(self):
+    #    return STARTED
 
 
 
@@ -223,6 +226,10 @@ if __name__ == '__main__':
     automationhat.light.warn.write(0.25)
     time.sleep(0.1)
 
+    # RPyC Server
+    rpycserver = ThreadedServer(BuzzerctlService, port = RPYCPORT)
+    rpycserver.start()
+
     # If auto start diabled, wait for power button press
     if AUTO_START_OFF:
         logging.info('Waiting for power button press...')
@@ -235,10 +242,6 @@ if __name__ == '__main__':
     startup()
     STARTED = True
     logging.debug('is_started() {0}'.format(is_started()))
-
-    # RPyC Server
-    rpycserver = ThreadedServer(CheckStatus, port = 8080)
-    rpycserver.start()
 
     # Set comms light on to indicate program running
     automationhat.light.comms.on()
