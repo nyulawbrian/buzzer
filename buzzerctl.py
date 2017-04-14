@@ -5,6 +5,7 @@ import argparse, threading
 import RPi.GPIO as GPIO
 import automationhat
 import rpyc
+from rpyc.utils.server import ThreadedServer
 
 # Get command line arguments
 DESCRIPTION = """Interface Raspberry Pi Pimoroni Automation HAT with Lee Dan
@@ -154,6 +155,15 @@ class Blink():
         logging.debug('Reverting output to original state: {0}'.format(self.originalState))
 
 
+# Class for RPyC server
+class CheckStatus(rpyc.Service):
+    def __init__(self):
+
+    def is_started(self):
+        return STARTED
+
+
+
 def startup():
     """Run through startup sequence to check software and
     hardware presence and states, then setup default states"""
@@ -224,6 +234,10 @@ if __name__ == '__main__':
     startup()
     STARTED = True
     logging.debug('is_started() {0}'.format(is_started()))
+
+    # RPyC Server
+    rpycserver = ThreadedServer(CheckStatus, port = 8080)
+    rpycserver.start()
 
     # Set comms light on to indicate program running
     automationhat.light.comms.on()

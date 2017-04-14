@@ -30,6 +30,10 @@ logging.debug('loaded config from __name__')
 # Set (export) env var to point to a config file
 # app.config.from_envvar('SOMEENVVAR', silent=True)
 
+# Create RPyC connection to buzzerctl
+buzzconn = rpyc.connect("localhost", 8080)
+buzzerctl = buzzconn.root
+
 
 @app.route('/')
 def hello_world():
@@ -37,7 +41,10 @@ def hello_world():
     #automationhat.light.power.toggle()
     time.sleep(5)
     #flash('Power light ={0}'.format(automationhat.light.power.read()))
-    return 'hi'
+
+    logging.debug('is_started ={0}'.format(buzzerctl.is_started()))
+
+    return 'is_started ={0}'.format(buzzerctl.is_started())
 
 logging.debug('no longer in hello_world')
 
