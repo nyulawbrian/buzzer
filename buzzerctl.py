@@ -4,8 +4,8 @@ import time, sys, logging
 import argparse, threading
 import RPi.GPIO as GPIO
 import automationhat
-import rpyc
-from rpyc.utils.server import ThreadedServer
+import shelve
+import settings as bs
 
 # Get command line arguments
 DESCRIPTION = """Interface Raspberry Pi Pimoroni Automation HAT with Lee Dan
@@ -46,10 +46,9 @@ DOOR_RELEASE_HOLD = args.doorreleasehold
 logging.debug('Door release hold is {0} second(s)'.format(DOOR_RELEASE_HOLD))
 AUTO_START_OFF = args.noautostart
 logging.debug('Auto start disabled.')
+global STARTED
 STARTED = False
 logging.debug('STARTED = False')
-RPYCHOST = 'localhost'
-RPYCPORT = 5001
 
 # Alias I/O ports to meaningful names
 APT_STATION_AUDIO_DISABLE   = automationhat.relay.one
@@ -99,7 +98,19 @@ def press_door_release():
     DOOR_BUTTON_PRESS.off()
 
 
-def is_started():
+def is_started(setval=None):
+    global STARTED
+
+    if setval is True:
+        STARTED = True
+    elif setval is False:
+        STARTED = False
+
+    # Write value to shelve db
+    d = shelve.open(bs.STATEFILE, writeback=True)
+    d['started'] = STARTED
+    d.close()
+
     return STARTED
 
 
@@ -155,17 +166,6 @@ class Blink():
         revertState = '{0}.write({1})'.format(self.func, self.originalState)
         eval(revertState)
         logging.debug('Reverting output to original state: {0}'.format(self.originalState))
-
-
-# Class for RPyC server
-class BuzzerctlService(rpyc.Service):
-    pass
-    #def __init__(self):
-    #    pass
-    #
-    #def is_started(self):
-    #    return STARTED
-
 
 
 def startup():
@@ -226,9 +226,7 @@ if __name__ == '__main__':
     automationhat.light.warn.write(0.25)
     time.sleep(0.1)
 
-    # RPyC Server
-    rpycserver = ThreadedServer(BuzzerctlService, port = RPYCPORT)
-    rpycserver.start()
+    is_started(False)
 
     # If auto start diabled, wait for power button press
     if AUTO_START_OFF:
@@ -240,7 +238,7 @@ if __name__ == '__main__':
     # Run startup sequence
     logging.debug('is_started() {0}'.format(is_started()))
     startup()
-    STARTED = True
+    is_started(True)
     logging.debug('is_started() {0}'.format(is_started()))
 
     # Set comms light on to indicate program running
