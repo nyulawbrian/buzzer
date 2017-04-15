@@ -59,7 +59,7 @@ def main():
 
     time.sleep(1)
 
-    return jsonify(states)
+    return states['started']
 
 logging.debug('no longer in main()')
 
