@@ -1,10 +1,11 @@
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
-
-import rpyc
-#import automationhat
 import time
 import logging
+import shelve
+import settings as bs
+
+STATEFILE = '../{0}'.format(bs.STATEFILE)
 
 # Configure logging options
 loggingLevel = 'logging.DEBUG'
@@ -30,24 +31,36 @@ logging.debug('loaded config from __name__')
 # Set (export) env var to point to a config file
 # app.config.from_envvar('SOMEENVVAR', silent=True)
 
-# Create RPyC connection to buzzerctl
-RPYCHOST = 'localhost'
-RPYCPORT = 5001
-buzzconn = rpyc.connect(RPYCHOST, RPYCPORT)
-buzzerctl = buzzconn.root
+def read_state(skey):
+    # Read value from shelve db
+    d = shelve.open(STATEFILE)
+    sval = d[skey]
+    d.close()
+    return sval
+
+def get_state_keys():
+    # Read keys in shelve db
+    d = shelve.open(STATEFILE)
+    skeys = d.keys()
+    d.close()
+    return skeys
 
 
 @app.route('/')
-def hello_world():
-    logging.debug('in hello_worl()')
-    #automationhat.light.power.toggle()
-    time.sleep(5)
-    #flash('Power light ={0}'.format(automationhat.light.power.read()))
+def main():
+    logging.debug('in main()')
 
-    logging.debug('is_started ={0}'.format(buzzerctl.is_started()))
+    states = {}
 
-    return 'is_started ={0}'.format(buzzerctl.is_started())
+    skeys = get_state_keys()
+    for thisKey in skeys:
+        states[thisKey] = read_state(thisKey)
+        flash('{0} is {1}'.format(thisKey,states[thisKey]))
 
-logging.debug('no longer in hello_world')
+    time.sleep(1)
+
+    return states
+
+logging.debug('no longer in main()')
 
 #EOF

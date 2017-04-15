@@ -46,7 +46,6 @@ DOOR_RELEASE_HOLD = args.doorreleasehold
 logging.debug('Door release hold is {0} second(s)'.format(DOOR_RELEASE_HOLD))
 AUTO_START_OFF = args.noautostart
 logging.debug('Auto start disabled.')
-global STARTED
 STARTED = False
 logging.debug('STARTED = False')
 
@@ -57,6 +56,15 @@ DOOR_TONE_DETECT_INDICATOR  = automationhat.output.one
 DOOR_TONE_INPUT             = automationhat.input.one
 POWER_BUTTON                = automationhat.input.two
 DOOR_RELEASE_BUTTON_INPUT   = automationhat.input.three
+STATEKEYS = [
+    'APT_STATION_AUDIO_DISABLE',
+    'DOOR_BUTTON_PRESS',
+    'DOOR_TONE_DETECT_INDICATOR',
+    'DOOR_TONE_INPUT',
+    'POWER_BUTTON',
+    'DOOR_RELEASE_BUTTON_INPUT',
+    'NOTIFICATION',
+]
 
 
 def reset_automation_hat():
@@ -81,21 +89,41 @@ def reset_automation_hat():
     automationhat.output.one.off()
     automationhat.output.two.off()
     automationhat.output.three.off()
+    return
 
 
 def press_door_release():
     # Emulate door release button press
 
     # Press button
-    logging.debug('Pressing door release button.')
     DOOR_BUTTON_PRESS.on()
+    write_state('DOOR_BUTTON_PRESS', True)
+    logging.debug('Door release button pressed.')
 
     # Wait to release button for predetermiend time
     time.sleep(DOOR_RELEASE_HOLD)
 
     # Release button
-    logging.debug('Releasing door release button.')
     DOOR_BUTTON_PRESS.off()
+    write_state('DOOR_BUTTON_PRESS', False)
+    logging.debug('Door release button released.')
+    return
+
+
+def write_state(skey, sval):
+    # Write value to shelve db
+    d = shelve.open(bs.STATEFILE, writeback=True)
+    d[skey] = sval
+    d.close()
+    return
+
+
+def read_state(skey):
+    # Read value from shelve db
+    d = shelve.open(bs.STATEFILE)
+    sval = d[skey]
+    d.close()
+    return sval
 
 
 def is_started(setval=None):
@@ -107,10 +135,7 @@ def is_started(setval=None):
         STARTED = False
 
     # Write value to shelve db
-    d = shelve.open(bs.STATEFILE, writeback=True)
-    d['started'] = STARTED
-    d.close()
-
+    write_state('started', STARTED)
     return STARTED
 
 
@@ -198,14 +223,17 @@ def startup():
 
     # Disable apartment station audio
     APT_STATION_AUDIO_DISABLE.on()
+    write_state('APT_STATION_AUDIO_DISABLE', True)
     time.sleep(0.1)
 
     # Set door button open
     DOOR_BUTTON_PRESS.off()
+    write_state('DOOR_BUTTON_PRESS', False)
     time.sleep(0.1)
 
     # Set door tone detect indicator off
     DOOR_TONE_DETECT_INDICATOR.off()
+    write_state('DOOR_TONE_DETECT_INDICATOR', False)
     time.sleep(0.1)
 
     # Set GPIO 14 HIGH for indicator light
@@ -227,6 +255,10 @@ if __name__ == '__main__':
     time.sleep(0.1)
 
     is_started(False)
+
+    # Set current states to None
+    for thisKey in STATEKEYS:
+        write_state(thisKey, None)
 
     # If auto start diabled, wait for power button press
     if AUTO_START_OFF:
@@ -252,16 +284,20 @@ if __name__ == '__main__':
         # Check if door tone is detected
         if DOOR_TONE_INPUT.read():
             time.sleep(0.1)
+            write_state('DOOR_TONE_INPUT', True)
             logging.info('Door tone detected.')
             logging.debug('DOOR_TONE_INPUT is HIGH')
+
 
             # Blink notification light
             notification = Blink('output','one')
             notification.on()
+            write_state('NOTIFICATION', True)
             time.sleep(0.1)
 
             # Enable apartment station audio
             APT_STATION_AUDIO_DISABLE.off()
+            write_state('APT_STATION_AUDIO_DISABLE', False)
             logging.debug('APT_STATION_AUDIO_DISABLE is OFF')
 
             # Poll for door release button press
@@ -273,10 +309,12 @@ if __name__ == '__main__':
 
             # Disable apartment station audio
             APT_STATION_AUDIO_DISABLE.on()
+            write_state('APT_STATION_AUDIO_DISABLE', True)
             logging.debug('APT_STATION_AUDIO_DISABLE is ON')
 
             # Stop blinking notification light
             notification.off()
+            write_state('NOTIFICATION', False)
             #continue
 
         # Poll for door release button press, even if door tone not detected
@@ -285,6 +323,8 @@ if __name__ == '__main__':
             press_door_release()
             time.sleep(0.1)
 
-    logging.info('Shutting down.')
+    logging.info('Shutting down...')
+    is_started(False)
+    logging.info('HALTED')
 
 # EOF
