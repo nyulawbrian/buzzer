@@ -1,0 +1,8 @@
+MANIFEST.in
+buzzerweb/__init__.py
+buzzerweb/buzzerweb.py
+buzzerweb.egg-info/PKG-INFO
+buzzerweb.egg-info/SOURCES.txt
+buzzerweb.egg-info/dependency_links.txt
+buzzerweb.egg-info/requires.txt
+buzzerweb.egg-info/top_level.txt
