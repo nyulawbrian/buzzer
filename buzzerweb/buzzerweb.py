@@ -42,6 +42,13 @@ def read_state(skey):
     d.close()
     return sval
 
+def write_state(skey, sval):
+    # Write value to shelve db
+    d = shelve.open(STATEFILE, writeback=True)
+    d[skey] = sval
+    d.close()
+    return
+
 def get_state_keys():
     # Read keys in shelve db
     d = shelve.open(STATEFILE)
@@ -49,11 +56,11 @@ def get_state_keys():
     d.close()
     return skeys
 
-logging.debug('not yet in main()')
+logging.debug('not yet in dashboard()')
 
 @app.route('/')
-def main():
-    logging.debug('in main()')
+def dashboard():
+    logging.debug('in dashboard()')
 
     states = {}
 
@@ -63,8 +70,23 @@ def main():
     for thisKey in skeys:
         states[thisKey] = read_state(thisKey)
 
-    time.sleep(1)
+    if states['STARTED']:
+        status = 'running'
+    else:
+        status = 'not running'
 
-    return jsonify(states)
+    return render_template('buzzer_dashboard.html', status=status)
+
+
+@app.route('/buzzer_control')
+def buzzer_control():
+    if request.form('doorreleasehold'):
+        write_state('DOOR_RELEASE_BUTTON_INPUT_WEB', True)
+        flash('Door release button pressed!')
+        time.sleep(2)
+        write_state('DOOR_RELEASE_BUTTON_INPUT_WEB', False)
+
+    return redirect(url_for('dashboard'))
+
 
 #EOF
