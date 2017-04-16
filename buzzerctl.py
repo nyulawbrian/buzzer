@@ -329,8 +329,8 @@ if __name__ == '__main__':
         DRBI  = DOOR_RELEASE_BUTTON_INPUT.read()
         # Web door release button state
         DRBIW = read_state('DOOR_RELEASE_BUTTON_INPUT_WEB')
-        
-        elif DRBI or DRBIW:
+
+        if DRBI or DRBIW:
             logging.debug('Door release button detected without door tone')
             press_door_release()
             time.sleep(0.1)
