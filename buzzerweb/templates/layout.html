@@ -9,4 +9,8 @@
   {% endfor %}
 
   {% block body %}{% endblock %}
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="{{
+    url_for('static', filename='jquery.min.js') }}">\x3C/script>')</script>
 </div>
