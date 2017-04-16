@@ -311,6 +311,7 @@ if __name__ == '__main__':
                 if DRBI or DRBIW:
                     logging.info('Door release button press detected.')
                     press_door_release()
+                    write_state('DOOR_RELEASE_BUTTON_INPUT_WEB', False)
 
                 time.sleep(0.1)
 
@@ -333,6 +334,7 @@ if __name__ == '__main__':
         if DRBI or DRBIW:
             logging.debug('Door release button detected without door tone')
             press_door_release()
+            write_state('DOOR_RELEASE_BUTTON_INPUT_WEB', False)
             time.sleep(0.1)
 
     logging.info('Shutting down...')
