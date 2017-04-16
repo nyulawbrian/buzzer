@@ -1,11 +1,14 @@
 #! /bin/bash
 
 # Start buzzer control back end
+echo Starting backend...
 python buzzerctl.py --noautostart --debug &
 
 sleep 2
 
 # Start buzzer control web front end
+echo Starting web frontend...
+
 # Set environmental variables
 export FLASK_APP=buzzerweb
 export FLASK_DEBUG=true

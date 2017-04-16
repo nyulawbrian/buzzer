@@ -18,6 +18,7 @@ logging.info('Logging level is {0}'.format(loggingLevel))
 
 # Create application instance
 app = Flask(__name__)
+app.secret_key = 'some_secret'
 logging.debug('created application instance')
 
 # Load config from this file
@@ -65,17 +66,18 @@ def dashboard():
     states = {}
 
     skeys = get_state_keys()
-    print skeys
 
     for thisKey in skeys:
         states[thisKey] = read_state(thisKey)
+
+    print states
 
     if states['STARTED']:
         status = 'running'
     else:
         status = 'not running'
 
-    return render_template('buzzer_dashboard.html', status=status)
+    return render_template('index.html', status=status)
 
 
 @app.route('/buzzer_control', methods=['POST'])
