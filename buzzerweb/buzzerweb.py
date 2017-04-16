@@ -80,7 +80,7 @@ def dashboard():
 
 @app.route('/buzzer_control', methods=['POST'])
 def buzzer_control():
-    if request.form('doorreleasehold'):
+    if request.form('doorreleasebutton'):
         write_state('DOOR_RELEASE_BUTTON_INPUT_WEB', True)
         flash('Door release button pressed!')
         time.sleep(2)
