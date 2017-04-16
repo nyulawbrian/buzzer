@@ -135,7 +135,7 @@ def is_started(setval=None):
         STARTED = False
 
     # Write value to shelve db
-    write_state('started', STARTED)
+    write_state('STARTED', STARTED)
     return STARTED
 
 
