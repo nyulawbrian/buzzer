@@ -78,7 +78,7 @@ def dashboard():
     return render_template('buzzer_dashboard.html', status=status)
 
 
-@app.route('/buzzer_control')
+@app.route('/buzzer_control', methods=['POST'])
 def buzzer_control():
     if request.form('doorreleasehold'):
         write_state('DOOR_RELEASE_BUTTON_INPUT_WEB', True)

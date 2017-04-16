@@ -64,6 +64,8 @@ STATEKEYS = [
     'POWER_BUTTON',
     'DOOR_RELEASE_BUTTON_INPUT',
     'NOTIFICATION',
+    'STARTED',
+    'DOOR_RELEASE_BUTTON_INPUT_WEB',
 ]
 
 
@@ -288,7 +290,6 @@ if __name__ == '__main__':
             logging.info('Door tone detected.')
             logging.debug('DOOR_TONE_INPUT is HIGH')
 
-
             # Blink notification light
             notification = Blink('output','one')
             notification.on()
@@ -302,9 +303,15 @@ if __name__ == '__main__':
 
             # Poll for door release button press
             for i in range(DOOR_TIMEOUT * 10):
-                if DOOR_RELEASE_BUTTON_INPUT.read():
+                # Hardware door release button state
+                DRBI  = DOOR_RELEASE_BUTTON_INPUT.read()
+                # Web door release button state
+                DRBIW = read_state('DOOR_RELEASE_BUTTON_INPUT_WEB')
+
+                if DRBI or DRBIW:
                     logging.info('Door release button press detected.')
                     press_door_release()
+
                 time.sleep(0.1)
 
             # Disable apartment station audio
