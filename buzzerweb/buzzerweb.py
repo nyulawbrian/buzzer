@@ -59,7 +59,7 @@ def main():
 
     time.sleep(1)
 
-    return states['started']
+    return STATEFILE
 
 logging.debug('no longer in main()')
 
