@@ -60,9 +60,9 @@ def main():
 
     for thisKey in skeys:
         states[thisKey] = read_state(thisKey)
-        flash('{0} is {1}'.format(thisKey,states[thisKey]))
-        logging.debug('thisKey = {0}'.format(thisKey))
-        logging.debug('thisKey value = {0}'.format(read_state(thisKey))
+        #flash('{0} is {1}'.format(thisKey,states[thisKey]))
+        #logging.debug('thisKey = {0}'.format(thisKey))
+        #logging.debug('thisKey value = {0}'.format(read_state(thisKey))
         #logging.debug('states[{0}] = {1}'.format(thisKey, states[thisKey]))
 
     time.sleep(1)
