@@ -3,6 +3,7 @@
 # Start buzzer control back end
 python buzzerctl.py --noautostart --debug &
 
+sleep 2
 
 # Start buzzer control web front end
 # Set environmental variables
