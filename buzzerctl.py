@@ -33,7 +33,7 @@ args = parser.parse_args()
 
 # Configure logging options
 loggingLevel = 'logging.DEBUG' if args.debug else 'logging.INFO'
-FORMAT = """%(asctime)-15s [%(levelname)s] (%(threadName)-10s) %(message)s"""
+FORMAT = """%(asctime)-15s [CTL] [%(levelname)s] (%(threadName)-10s) %(message)s"""
 logging.basicConfig(
     level=eval(loggingLevel),
     format=FORMAT)

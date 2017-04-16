@@ -10,7 +10,7 @@ STATEFILE = '../{0}'.format(bs.STATEFILE)
 
 # Configure logging options
 loggingLevel = 'logging.DEBUG'
-FORMAT = """%(asctime)-15s [%(levelname)s] (%(threadName)-10s) %(message)s"""
+FORMAT = """%(asctime)-15s [WEB] [%(levelname)s] (%(threadName)-10s) %(message)s"""
 logging.basicConfig(
     level=eval(loggingLevel),
     format=FORMAT)
@@ -69,13 +69,13 @@ def dashboard():
 
     for thisKey in skeys:
         states[thisKey] = read_state(thisKey)
-
-    print states
+    logging.debug('states = {0}'.format(states))
 
     if states['STARTED']:
         status = 'running'
     else:
         status = 'not running'
+    logging.debug('status = {0}'.format(status))
 
     return render_template('index.html', status=status)
 
