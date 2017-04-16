@@ -53,12 +53,13 @@ def get_state_keys():
     d.close()
     return skeys
 
+logging.debug('not yet in main()')
 
 @app.route('/')
 def main():
     logging.debug('in main()')
-    logging.debug('bs.STATEFILE = {0}'.format(bs.STATEFILE))
-    logging.debug('shelve file path = {0}'.format(STATEFILE))
+    #logging.debug('bs.STATEFILE = {0}'.format(bs.STATEFILE))
+    #logging.debug('shelve file path = {0}'.format(STATEFILE))
 
     states = {}
     logging.debug('states dict initialized')
@@ -68,15 +69,13 @@ def main():
 
     for thisKey in skeys:
         states[thisKey] = read_state(thisKey)
-        #flash('{0} is {1}'.format(thisKey,states[thisKey]))
-        #logging.debug('thisKey = {0}'.format(thisKey))
-        #logging.debug('thisKey value = {0}'.format(read_state(thisKey))
-        #logging.debug('states[{0}] = {1}'.format(thisKey, states[thisKey]))
+        flash('{0} is {1}'.format(thisKey,states[thisKey]))
+        logging.debug('thisKey = {0}'.format(thisKey))
+        logging.debug('thisKey value = {0}'.format(read_state(thisKey))
+        logging.debug('states[{0}] = {1}'.format(thisKey, states[thisKey]))
 
     time.sleep(1)
 
-    return jsonify(get_state_keys())
-
-logging.debug('no longer in main()')
+    return jsonify(states)
 
 #EOF
