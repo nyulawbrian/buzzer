@@ -2,6 +2,7 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash, jsonify
 import time
 import logging
+import os
 import shelve
 import settings as bs
 
@@ -31,16 +32,23 @@ logging.debug('loaded config from __name__')
 # Set (export) env var to point to a config file
 # app.config.from_envvar('SOMEENVVAR', silent=True)
 
+# Configure path
+resource_path = os.path.join(app.root_path, '../state')
+
+# debugging output
+logging.debug('app.root_path ={0}'.format(app.root_path))
+logging.debug('resource_path = {0}'.format(resource_path))
+
 def read_state(skey):
     # Read value from shelve db
-    d = shelve.open(STATEFILE)
+    d = shelve.open(resource_path)
     sval = d[skey]
     d.close()
     return sval
 
 def get_state_keys():
     # Read keys in shelve db
-    d = shelve.open(STATEFILE)
+    d = shelve.open(resource_path)
     skeys = d.keys()
     d.close()
     return skeys
