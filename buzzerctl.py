@@ -325,7 +325,12 @@ if __name__ == '__main__':
             #continue
 
         # Poll for door release button press, even if door tone not detected
-        elif DOOR_RELEASE_BUTTON_INPUT.read():
+        # Hardware door release button state
+        DRBI  = DOOR_RELEASE_BUTTON_INPUT.read()
+        # Web door release button state
+        DRBIW = read_state('DOOR_RELEASE_BUTTON_INPUT_WEB')
+        
+        elif DRBI or DRBIW:
             logging.debug('Door release button detected without door tone')
             press_door_release()
             time.sleep(0.1)
