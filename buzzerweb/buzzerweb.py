@@ -57,12 +57,8 @@ def get_state_keys():
     d.close()
     return skeys
 
-logging.debug('not yet in dashboard()')
-
-@app.route('/')
-def dashboard():
-    logging.debug('in dashboard()')
-
+def get_all_states():
+    # Read all values from shelve db
     states = {}
 
     skeys = get_state_keys()
@@ -70,6 +66,16 @@ def dashboard():
     for thisKey in skeys:
         states[thisKey] = read_state(thisKey)
     logging.debug('states = {0}'.format(states))
+
+    return states
+
+logging.debug('not yet in dashboard()')
+
+@app.route('/')
+def dashboard():
+    logging.debug('in dashboard()')
+
+    states = get_all_states()
 
     if states['STARTED']:
         status = 'running'
@@ -90,5 +96,11 @@ def buzzer_control():
 
     return redirect(url_for('dashboard'))
 
+
+@app.route('/get_status', methods=['GET'])
+def get_status():
+    states = get_all_states()
+
+    return states
 
 #EOF
