@@ -101,6 +101,6 @@ def buzzer_control():
 def get_status():
     states = get_all_states()
 
-    return states
+    return jsonify(states)
 
 #EOF
