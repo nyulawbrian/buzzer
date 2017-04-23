@@ -1,8 +1,11 @@
 #! /bin/bash
 
+cd /home/pi/buzzer/
+
 # Start buzzer control back end
 echo Starting backend...
-python /home/pi/buzzer/buzzerctl.py --noautostart --debug &
+#python /home/pi/buzzer/buzzerctl.py --noautostart --debug &
+python /home/pi/buzzer/buzzerctl.py &
 
 sleep 2
 
