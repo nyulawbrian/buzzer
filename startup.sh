@@ -2,7 +2,7 @@
 
 # Start buzzer control back end
 echo Starting backend...
-python buzzerctl.py --noautostart --debug &
+python /home/pi/buzzer/buzzerctl.py --noautostart --debug &
 
 sleep 2
 
