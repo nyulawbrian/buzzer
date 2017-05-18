@@ -1,5 +1,5 @@
-# Apartment Intercom Interface and Control
+# IoT Intercom Controller
 
-Apartment Intercom Interface and Control using Raspberry Pi and Pimoroni Automation HAT.
+An Internet of Things apartment intercom interface and controller using Raspberry Pi and Pimoroni Automation HAT.
 
 This project is in active developement.  More info to come...
